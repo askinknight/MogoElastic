@@ -1,0 +1,10 @@
+server.name: kibana
+server.host: "0.0.0.0"
+
+elasticsearch.hosts: [ "http://elasticsearch:9200" ]
+
+# ไม่มี security แล้ว → Kibana จะไม่ถาม login
+xpack.security.audit.enabled: false
+
+# ใช้ monitoring ได้
+xpack.monitoring.ui.container.elasticsearch.enabled: true

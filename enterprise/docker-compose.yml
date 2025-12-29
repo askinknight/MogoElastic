@@ -1,0 +1,68 @@
+version: '3.9'
+
+services:
+  elasticsearch:
+    env_file: .env
+    container_name: elasticsearch
+    build:
+      context: elasticsearch/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    ports:
+      - 9200:9200
+      - 9300:9300
+    volumes:
+      - type: bind
+        source: ./elasticsearch/config/elasticsearch.yml
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+        read_only: true
+      - type: volume
+        source: elasticsearchdata
+        target: /usr/share/elasticsearch/data
+    networks:
+      - elk
+  
+  kibana:
+    build:
+      context: kibana/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    ports:
+      - 5601:5601
+    volumes:
+      - type: bind
+        source: ./kibana/config/kibana.yml
+        target: /usr/share/kibana/config/kibana.yml
+        read_only: true
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
+
+  monstache:
+    image: rwynn/monstache:latest
+    container_name: monstache
+    environment:
+      # ใช้ IP + authSource=admin + replicaSet=rs0 (สำคัญ)
+      - MONSTACHE_MONGO_URL=mongodb://root:root123@192.168.101.1:27017/dgaid_db?authSource=admin&replicaSet=rs0
+
+      # Elasticsearch service name
+      - MONSTACHE_ES_URLS=http://elastic:elasticpass@elasticsearch:9200
+
+      - MONSTACHE_CHANGE_STREAM_NS=dgaid_db
+    volumes:
+      - monstachedata:/monstache/
+      - ./monstache/config.toml:/monstache/config.toml
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
+networks:
+  elk:
+    driver: bridge
+
+volumes:
+  elasticsearchdata:
+  monstachedata:

@@ -1,0 +1,29 @@
+mongo-url = "mongodb://root:rootpassword@192.168.101.1:27017,dgaid-replica2:27017,dgaid-replica3:27017/dgaid_db?authSource=admin&replicaSet=rs0"
+
+elasticsearch-urls = ["http://elastic:elasticpass@192.168.101.3:9200"]
+
+change-stream-namespaces = ["dgaid_db.*"]
+# Direct reads (import ข้อมูลเก่าทั้งหมดก่อน watch change streams)
+direct-read-namespaces = ["dgaid_db.*"]
+direct-read-parallel = true      # อ่านหลาย collection พร้อมกัน
+
+gzip = true
+stats = true
+index-stats = true
+elasticsearch-max-conns = 4
+dropped-collections = true
+dropped-databases = true
+
+resume = true
+resume-write-unsafe = false
+resume-name = "default"
+resume-strategy = 1
+
+namespace-exclude-regex = '^mydb\.ignorecollection$'
+
+index-files = false
+file-highlighting = true
+verbose = false
+
+cluster-name = "apollo"
+exit-after-direct-reads = false
